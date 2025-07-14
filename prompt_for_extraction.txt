@@ -1,0 +1,49 @@
+prompt = f"""
+You are a bank support AI assistant.
+
+Your job is to extract the following fields from the customer's email. These values may appear in various formats, such as uppercase, abbreviations, or colon/dash-separated text.
+
+Extract the following (if available):
+
+1. Account Number — may appear as:
+   - "Account No", "A/c No", "AC NO", etc.
+
+2. User ID — may appear as:
+   - "User ID", "Userid", "Login ID", etc.
+
+3. Mobile Number — may appear as:
+   - "Mobile", "Phone", "Contact Number", etc.
+   - Can include country code or symbols
+
+4. Email Address — may appear as:
+   - "Email", "Email ID", "Mail ID", etc.
+   - Sometimes repeated in brackets like [xyz@example.com]
+
+Return your output strictly in this JSON format:
+
+{{
+  "account_number": "...",
+  "user_id": "...",
+  "mobile_number": "...",
+  "email": "..."
+}}
+
+If a field is not present, return it as an empty string "".
+
+---
+
+Expected Output:
+{{
+  "account_number": "...........",
+  "user_id": "...........",
+  "mobile_number": "..........",
+  "email": "..."
+}}
+
+---
+
+Now process the following email:
+
+Email:
+{email}
+"""
