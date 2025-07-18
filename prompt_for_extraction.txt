@@ -129,3 +129,31 @@ Respond in JSON format only:
 Email:
 {email}
 """
+
+
+
+(5)
+
+prompt = f"""
+Extract the following entities from the given email. Normalize all field names and formats in the output. If any field is not present, return its value as null. Output should be valid JSON with these exact keys:
+
+- "AC/No 1"
+- "AC/No 2"
+- "Name"
+- "Mobile Number"
+- "Email ID"
+- "User ID"
+- "Corporate ID"
+
+Guidelines:
+- For account numbers, accept formats like "A/c No", "Account Number", "AC NO", etc., but output must always use "AC/No" as key.
+- For email, handle variations like "EMAIL", "E-mail", "EMAIL ID", etc., but always use "Email ID" in output.
+- For mobile number, accept 10-digit values with/without symbols (e.g., dashes or country codes).
+- For name, look for labels like "AC NAME", "Account Holder", or "Mr./Ms." but use "Name" in output.
+- For user ID or corporate ID, standardize to keys "User ID" and "Corporate ID" regardless of input variation.
+
+Only return the JSON object. Do not include any explanations or copied labels.
+
+Email:
+{email}
+"""
