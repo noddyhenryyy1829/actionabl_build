@@ -86,3 +86,46 @@ Output:
 Now extract from this email:
 {email}
 """
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+(4)
+prompt = f"""
+Extract the following details from the email. If a value is missing, use null:
+
+- Account Number: 11-digit number, may appear as "AC NO", "A/c", etc.
+- Mobile Number: 10-digit, may include separators
+- Email ID: appears as "Email", "EMAIL ID", etc.
+- Name: usually follows "AC NAME", "Mr.", "Ms.", etc.
+- User ID: may appear as "User ID", "Login ID", etc.
+- Corporate ID: may appear as "Corporate ID", "Corp login", etc.
+
+Respond in JSON format only:
+
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "...",
+  "User ID": "...",
+  "Corporate ID": "..."
+}}
+
+Email:
+{email}
+"""
