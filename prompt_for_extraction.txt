@@ -157,3 +157,34 @@ Only return the JSON object. Do not include any explanations or copied labels.
 Email:
 {email}
 """
+
+
+
+(6)
+prompt = f"""
+You are an intelligent banking assistant. Extract the following entities from the email. These may appear in various formats or spellings:
+
+1. Account Number – appears as "AC NO", "A/c", "Account No.", etc. (11-digit number).
+2. User ID – may be written as "USER ID", "Userid", etc.
+3. Corporate ID – may appear as "Corporate ID", "Corp ID", "CorpID", etc.
+4. CIF Number – also known as "Customer Information File number".
+5. Mobile Number – a 10-digit number, may include separators or country code.
+6. Email ID – formats like "EMAIL ID", "Email", or "E-mail".
+
+Return only if the entity is present. Use this strict JSON format with standard keys (do not change based on input variation):
+
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "User ID": "...",
+  "Corporate ID": "...",
+  "CIF Number": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Ensure extracted values are cleaned (e.g., remove "AC NO -", "Email:", etc.) and mapped to the above JSON keys.
+
+Now extract from this email:
+{email}
+"""
