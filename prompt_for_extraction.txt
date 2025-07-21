@@ -188,3 +188,232 @@ Ensure extracted values are cleaned (e.g., remove "AC NO -", "Email:", etc.) and
 Now extract from this email:
 {email}
 """
+Hello Sir,
+Please find attached the Expense Reimbursement Sheet for the month of June 2025. Kindly let me know if any additional details are required.
+
+Thanks and regards
+Ajit Rawat
+
+June_2025 Reimbursement Approval request
+
+i have 1442 data on label sudio okay so what i want is that i have ml  backend connected with label studio with bert classification sentiment so the model 
+wil precit that the email falls in which category it is like intertnet baning > unblock , or mobile banking > payment issue and so on so i the data is coming to my label studi
+from my own platfrom actionbl wiht labelling and i want to start training so what should be the number of epoches and and one more probelm is there prevoisuy iran the training
+but the prediction were bad so what should i do with
+
+so bsially we receive mails on our portal so we need to classify them into categories like 
+internet banking > request > unlock 
+mobile banking > transaction > money debited adn so one we have 200 such categories as of now so we want whatever the new mail will come the moidel should lassify them
+into one of the following 200 categoires so which would be the best option ?
+
+
+
+
+so i want to know how an why this is happening
+
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+model_name = 'google/flan-t5-large'
+tokenizer = T5Tokenizer.from_pretrained(model_name)
+model = T5ForConditionalGeneration.from_pretrained(model_name)
+
+
+prompt = f"""
+Extract the following entities from the given email. The terms may appear in various formats:
+
+1. Account Number — may appear as "AC NO", "A/c", "Account number", etc.
+2. Mobile Number — can be 10-digit number with or without separators.
+3. Email ID — may be written as "EMAIL ID", "Email", "E-mail".
+4. Name — typically appears after "AC NAME", "Account Holder", or "Mr./Ms."
+
+Return your output strictly in this format:
+{{
+  "Account Number 1": "...",
+  "Account Number 2": "...",
+  "Name": "...",
+  "Mobile Number": "...",
+  "Email ID": "..."
+}}
+
+Example:
+Email:
+"40263401618 AC NO - 60447820881 AC NAME - Mr. PATEL RUSHIT MADHUSUDHAN MOBILE NO. - 919429318828 EMAIL ID - rushitpatel91910@gmail.com"
+Output:
+{{
+  "Account Number 1": "40263401618",
+  "Account Number 2": "60447820881",
+  "Name": "Mr. PATEL RUSHIT MADHUSUDHAN",
+  "Mobile Number": "919429318828",
+  "Email ID": "rushitpatel91910@gmail.com"
+}}
+
+Now extract from this email:
+{email}
+"""
+
+inputs=tokenizer(prompt,return_tensors="pt",truncation=True,max_length=1024)
+outputs=model.generate(**inputs,max_new_tokens=200)
+response=tokenizer.decode(outputs[0],skip_special_tokens=True)
+print(response)
+
+
+so this is the code with prompt okay so code part is workig fine but when running this code on the 
+email="""
+Account no.-60490639765
+Name- Rusha Mercantile Alliance
+Corporate ID-rusvp00001
+User ID-yaswv00001
+
+
+"""
+output = Output:  "Account no.-60490639765", "Name": "Rusha Mercantile Alliance", "Corporate ID": "rusvp00001", "User ID": "yaswv00001"
+
+but when giving example 2 
+
+email="""
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+
+Account no.-60490639765
+
+notifications
+
+Name- Rusha Mercantile Alliance
+
+
+Request raised-enabling bulk payment mode in IB
+
+Sent Mails
+
+Corporate ID-rusvp00001
+
+User ID-yaswv00001
+
+"""
+
+output=Output:  "Rusha Mercantile Alliance"
+
+
+then example 3 
+email="""
+Hi, So i mam writing this mail just to test nmy model's prediction okay,
+Request raised-enabling bulk payment mode in IB
+Sent Mails
+
+dear Sir,my account number is 11112222333,
+
+
+and my id user is ajit12345
+
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+
+and my if for corporate is ccc34567
+
+Sent Mails
+
+my email is tester23@gmail.com
+
+
+
+
+phone numbe is +2345612343333"""
+
+output = Output:  "Request raised-enabling bulk payment mode in IB"
+
+
+then example 4= 
+
+email="""
+Hi, So i mam writing this mail just to test nmy model's prediction okay,
+
+
+dear Sir,my account number is 11112222333,
+
+
+and my id user is ajit12345
+
+.
+
+and my if for corporate is ccc34567
+
+
+my email is tester23@gmail.com
+
+
+
+
+phone numbe is +2345612343333"""
+
+output= Output:  "Account Number": "11112222333", "Account ID": "ajit12345", "If for corporate": "ccc34567", "Email": "tester23@gmail.com", "Mobile Number": +2345612343333
+
+
+
+
+
+
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+import re
+
+# Load model and tokenizer
+model_name = "google/flan-t5-large"
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+model = AutoModelForSeq2SeqLM.from_pretrained(model_name)
+
+# Define email sample
+email = """
+Please find attached the customer request for enabling bulk payment mode in their internet banking facility.
+Account no.-60490639765 notifications
+Name- Rusha Mercantile Alliance
+Request raised-enabling bulk payment mode in IB
+Sent Mails
+Corporate ID-rusvp00001
+User ID-yaswv00001
+"""
+
+# Prompt template with User ID and Corporate ID included
+prompt_template = """
+Extract the following details from the email:
+- Account Numbers
+- Name
+- Mobile Number
+- Email ID
+- Corporate ID
+- User ID
+
+Email:
+{email}
+
+Return output as key-value pairs like:
+Account Number 1: ...
+Account Number 2: ...
+Name: ...
+Mobile Number: ...
+Email ID: ...
+Corporate ID: ...
+User ID: ...
+"""
+
+# Format the prompt
+prompt = prompt_template.format(email=email)
+
+# Tokenize and generate
+inputs = tokenizer(prompt, return_tensors="pt", max_length=1024, truncation=True)
+outputs = model.generate(**inputs, max_new_tokens=256)
+output_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+# Use regex to extract from output OR fallback to raw email
+def extract_field(pattern, text):
+    match = re.search(pattern, text, re.IGNORECASE)
+    return match.group(1).strip() if match else ""
+
+data = {
+    "Account Number 1": extract_field(r"Account Number 1:\s*(.+)", output_text) or extract_field(r"Account no\.\-?\s*(\d+)", email),
+    "Account Number 2": extract_field(r"Account Number 2:\s*(.+)", output_text),
+    "Name": extract_field(r"Name:\s*(.+)", output_text) or extract_field(r"Name[\-:]?\s*(.+)", email),
+    "Mobile Number": extract_field(r"Mobile Number:\s*(.+)", output_text) or extract_field(r"(?:Mobile Number|MOBILE NO)[\s\-:]*(\+?\d{10,15})", email),
+    "Email ID": extract_field(r"Email ID:\s*(.+)", output_text) or extract_field(r"Email[\s\-:]*(\S+@\S+)", email),
+    "Corporate ID": extract_field(r"Corporate ID:\s*(.+)", output_text) or extract_field(r"Corporate ID[\-:]?\s*(\w+)", email),
+    "User ID": extract_field(r"User ID:\s*(.+)", output_text) or extract_field(r"User ID[\-:]?\s*(\w+)", email)
+}
+
+# Final Output
+print("\n📤 Final Extracted Output:")
+print(data)
